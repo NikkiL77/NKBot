@@ -47,22 +47,22 @@ async def on_message(message):
 
     try:
         # 偵測語言
-        detected = translator.detect(text)
+        detected = await translator.detect(text)
         lang = detected.lang
 
         # 只翻譯英文
         if lang == "en":
-            result = translator.translate(text, src="en", dest="zh-tw")
+            result = await translator.translate(text, src="en", dest="zh-tw")
             #print("英 ➜ 繁體中文：")
         # 粵語特徵字 → 繁體中文
         elif contains_cantonese(text):
-            result = translator.translate(text, dest="zh-tw")
+            result = await translator.translate(text, dest="zh-tw")
             #print("翻粵語 ➜ 繁體中文：")
         else:
             return
         
         await message.reply(
-            f"🌐：{result.text}"
+            f"🍉：{result.text}"
         )
 
     except Exception as e:
