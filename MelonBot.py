@@ -3,20 +3,18 @@ import discord
 from googletrans import Translator
 import os
 from dotenv import load_dotenv
+from keep_alive import keep_alive
+
 load_dotenv() 
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-#DISCORD_TOKEN = os.environ['DISCORD_TOKEN']
 
-if not DISCORD_TOKEN:
-    raise ValueError("❌ 找不到 DISCORD_TOKEN，請確認 .env 是否正確")
-
-# 建立翻譯器
-translator = Translator()
 
 # client是跟discord連接，intents是要求機器人的權限
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents = intents)
+
+
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 
 CANTONESE_KEYWORDS = [
     "喺", "咁", "嘅", "佢", "佢哋", "我哋","哋",
@@ -26,6 +24,9 @@ CANTONESE_KEYWORDS = [
 
 def contains_cantonese(text: str) -> bool:
     return any(word in text for word in CANTONESE_KEYWORDS)
+
+# 建立翻譯器
+translator = Translator()
 
 # 調用event函式庫
 @client.event
@@ -47,16 +48,16 @@ async def on_message(message):
 
     try:
         # 偵測語言
-        detected = await translator.detect(text)
+        detected = translator.detect(text)
         lang = detected.lang
 
         # 只翻譯英文
         if lang == "en":
-            result = await translator.translate(text, src="en", dest="zh-tw")
+            result = translator.translate(text, src="en", dest="zh-tw")
             #print("英 ➜ 繁體中文：")
         # 粵語特徵字 → 繁體中文
         elif contains_cantonese(text):
-            result = await translator.translate(text, dest="zh-tw")
+            result = translator.translate(text, dest="zh-tw")
             #print("翻粵語 ➜ 繁體中文：")
         else:
             return
@@ -70,4 +71,21 @@ async def on_message(message):
 
 
 #機器人的TOKEN
-client.run(DISCORD_TOKEN)
+#client.run(DISCORD_TOKEN)
+try:
+    if not DISCORD_TOKEN:
+        raise ValueError("❌ 找不到 DISCORD_TOKEN，請確認 .env 是否正確")
+
+    keep_alive()
+    client.run(DISCORD_TOKEN)
+
+except discord.HTTPException as e:
+    if e.status == 429:
+         print(
+             "The Discord servers denied the connection for making too many requests"
+             )
+         print(
+            "Get help from https://stackoverflow.com/questions/66724687/in-discord-py-how-to-solve-the-error-for-toomanyrequests"
+        )
+    else:
+        raise e
