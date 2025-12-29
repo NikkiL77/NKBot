@@ -23,11 +23,24 @@ CANTONESE_KEYWORDS = [
     "點解", "乜", "咩", "仲", "晒"
 ]
 
+# 建立翻譯器
+translator = Translator()
+
 def contains_cantonese(text: str) -> bool:
     return any(word in text for word in CANTONESE_KEYWORDS)
 
-# 建立翻譯器
-translator = Translator()
+def is_only_emoji(text: str) -> bool:
+    # 去除空白與換行
+    stripped = text.strip()
+    if not stripped:
+        return False
+
+    # 移除所有 emoji
+    text_without_emoji = emoji.replace_emoji(stripped, replace="")
+
+    # 如果移除後只剩空白，代表原本全是 emoji
+    return text_without_emoji.strip() == ""
+
 
 # 調用event函式庫
 @client.event
@@ -68,7 +81,7 @@ async def on_message(message):
             return
         
         await message.reply(
-            f"🍉：{result.text}"
+            f"🤖：{result.text}"
         )
 
     except Exception as e:
@@ -94,15 +107,3 @@ except discord.HTTPException as e:
         )
     else:
         raise e
-    
-def is_only_emoji(text: str) -> bool:
-    # 去除空白與換行
-    stripped = text.strip()
-    if not stripped:
-        return False
-
-    # 移除所有 emoji
-    text_without_emoji = emoji.replace_emoji(stripped, replace="")
-
-    # 如果移除後只剩空白，代表原本全是 emoji
-    return text_without_emoji.strip() == ""
