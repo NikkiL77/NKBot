@@ -4,6 +4,7 @@ from googletrans import Translator
 import os
 from dotenv import load_dotenv
 from keep_alive import keep_alive
+import emoji
 
 load_dotenv() 
 
@@ -45,7 +46,11 @@ async def on_message(message):
     # 空訊息不處理
     if not text:
         return
-
+    
+    #emoji不處理
+    if is_only_emoji(text):
+        return  # 只有 emoji，直接 return
+    
     try:
         # 偵測語言
         detected = translator.detect(text)
@@ -89,3 +94,15 @@ except discord.HTTPException as e:
         )
     else:
         raise e
+    
+def is_only_emoji(text: str) -> bool:
+    # 去除空白與換行
+    stripped = text.strip()
+    if not stripped:
+        return False
+
+    # 移除所有 emoji
+    text_without_emoji = emoji.replace_emoji(stripped, replace="")
+
+    # 如果移除後只剩空白，代表原本全是 emoji
+    return text_without_emoji.strip() == ""
