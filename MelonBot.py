@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from keep_alive import keep_alive
 import emoji
+import asyncio
 
 load_dotenv() 
 
@@ -70,6 +71,9 @@ async def on_message(message):
         return  # 只有 emoji，直接 return
     
     try:
+        # googletrans 有速率限制 → 稍微放慢
+        await asyncio.sleep(0.3)
+
         # 偵測語言
         detected = translator.detect(text)
         lang = detected.lang
