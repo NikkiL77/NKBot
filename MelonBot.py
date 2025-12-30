@@ -41,11 +41,16 @@ def is_only_emoji(text: str) -> bool:
     # 如果移除後只剩空白，代表原本全是 emoji
     return text_without_emoji.strip() == ""
 
+ready_once = False
 
 # 調用event函式庫
 @client.event
 # 當機器人完成啟動
 async def on_ready():
+    global ready_once
+    if ready_once:
+        return
+    ready_once = True
     print(f"機器人已上線：{client.user}")
 
 @client.event
