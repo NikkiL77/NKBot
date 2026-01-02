@@ -1,1 +1,1 @@
-worker: python MelonBot_test.py
+worker: python MelonBot.py
