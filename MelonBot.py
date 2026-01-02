@@ -3,20 +3,15 @@ import discord
 from googletrans import Translator
 import os
 from dotenv import load_dotenv
-from keep_alive import keep_alive
 import emoji
 import asyncio
 
 load_dotenv() 
 
-
 # client是跟discord連接，intents是要求機器人的權限
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents = intents)
-
-
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 
 CANTONESE_KEYWORDS = [
     "喺", "咁", "嘅", "佢", "佢哋", "我哋","哋",
@@ -98,21 +93,5 @@ async def on_message(message):
 
 
 #機器人的TOKEN
-#client.run(DISCORD_TOKEN)
-try:
-    if not DISCORD_TOKEN:
-        raise ValueError("❌ 找不到 DISCORD_TOKEN，請確認 .env 是否正確")
-
-    keep_alive()
-    client.run(DISCORD_TOKEN)
-
-except discord.HTTPException as e:
-    if e.status == 429:
-         print(
-             "The Discord servers denied the connection for making too many requests"
-             )
-         print(
-            "Get help from https://stackoverflow.com/questions/66724687/in-discord-py-how-to-solve-the-error-for-toomanyrequests"
-        )
-    else:
-        raise e
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+client.run(DISCORD_TOKEN)
