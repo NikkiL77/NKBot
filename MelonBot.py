@@ -19,11 +19,17 @@ CANTONESE_KEYWORDS = [
     "點解", "乜", "咩", "仲", "晒"
 ]
 
+def contains_cantonese(text: str) -> bool:
+    return any(word in text for word in CANTONESE_KEYWORDS)
+
 # 建立翻譯器
 translator = Translator()
 
-def contains_cantonese(text: str) -> bool:
-    return any(word in text for word in CANTONESE_KEYWORDS)
+# 指定頻道
+ALLOWED_CHANNELS = {
+    1434742197642592298,  #閒聊
+    1434752955407405126   #開會
+}
 
 def is_only_emoji(text: str) -> bool:
     # 去除空白與換行
@@ -51,6 +57,10 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    # 只允許特定頻道
+    if message.channel.id not in ALLOWED_CHANNELS:
+        return
+    
     # 忽略機器人自己的訊息
     if message.author.bot:
         return
